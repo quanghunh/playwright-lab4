@@ -27,10 +27,16 @@ test('Locator practice - Make appointment', async ({ page }) => {
   );
  
   // getByText: click checkbox/radio
-  await page.getByText('Medicaid').click();
+  await page.getByText('Medicaid', { exact: true }).click();
  
-  // Fill date và comment
-  await page.fill('#txt_visit_date', '01/03/2025');
+  // Fill date - click first then fill (date picker)
+  // Website uses dd/mm/yyyy format (e.g., 30/12/2025 = Dec 30, 2025)
+  const dateInput = page.locator('#txt_visit_date');
+  await dateInput.click();
+  await dateInput.fill('30/12/2025');
+  await page.keyboard.press('Enter'); // Close date picker
+
+  // Fill comment
   await page.fill('#txt_comment',
     'Test appointment via Playwright');
  
@@ -38,7 +44,8 @@ test('Locator practice - Make appointment', async ({ page }) => {
   await page.getByRole('button',
     { name: 'Book Appointment' }).click();
  
-  // Verify confirmation
+  // Verify confirmation - wait for URL change first
+  await page.waitForURL(/appointment/, { timeout: 10000 });
   await expect(
     page.getByText('Appointment Confirmation')
   ).toBeVisible();

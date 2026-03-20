@@ -17,7 +17,8 @@ test.describe('CURA Healthcare - Login Tests', () => {
     await page.fill('#txt-password', 'ThisIsNotAPassword');
     await page.click('#btn-login');
  
-    // Xác minh chuyển đến trang đặt lịch
+    // Xác minh chuyển đến trang đặt lịch - wait for URL first
+    await page.waitForURL(/appointment/, { timeout: 10000 });
     await expect(page.locator('h2'))
       .toHaveText('Make Appointment');
   });

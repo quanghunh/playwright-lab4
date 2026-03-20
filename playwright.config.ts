@@ -1,79 +1,67 @@
 import { defineConfig, devices } from '@playwright/test';
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+ 
 export default defineConfig({
+  // Thư mục chứa test
   testDir: './tests',
-  /* Run tests in files in parallel */
+ 
+  // Chạy tất cả test trong 1 file song song
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+ 
+  // Fail build trên CI nếu có test.only
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
+ 
+  // Số lần retry khi test fail
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+ 
+  // Số worker chạy song song
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+ 
+  // Reporter: HTML report + console output
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list']
+  ],
+ 
+  // Cấu hình chung cho mọi test
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    // Base URL cho tất cả navigation
+    baseURL: 'https://katalon-demo-cura.herokuapp.com',
+ 
+    // Bật Trace cho lần chạy đầu tiên khi retry
     trace: 'on-first-retry',
+ 
+    // Chụp screenshot khi test fail
+    screenshot: 'only-on-failure',
+ 
+    // Quay video cho mọi test
+    video: 'retain-on-failure',
   },
-
-  /* Configure projects for major browsers */
+ 
+  // ====================================
+  // CẤU HÌNH NHIỀU TRÌNH DUYỆT
+  // ====================================
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+ 
+    // Test trên mobile viewport
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'mobile-safari',
+      use: { ...devices['iPhone 13'] },
+    },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });
